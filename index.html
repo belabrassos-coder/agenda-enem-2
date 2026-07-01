@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ENEM Planner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-icon">◈</span>
+      <span class="brand-name">ENEM<br><strong>Planner</strong></span>
+    </div>
+
+    <nav class="nav">
+      <button class="nav-btn active" data-tab="hoje">
+        <span class="nav-icon">☀</span> Hoje
+      </button>
+      <button class="nav-btn" data-tab="questoes">
+        <span class="nav-icon">✎</span> Questões
+      </button>
+      <button class="nav-btn" data-tab="materias">
+        <span class="nav-icon">◎</span> Matérias
+      </button>
+      <button class="nav-btn" data-tab="tempo">
+        <span class="nav-icon">◷</span> Tempo
+      </button>
+      <button class="nav-btn" data-tab="semana">
+        <span class="nav-icon">⊟</span> Semana
+      </button>
+      <button class="nav-btn" data-tab="resumo">
+        <span class="nav-icon">◈</span> Resumo
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="data-info">Dados salvos localmente</div>
+      <button class="btn-reset" id="btnReset">Limpar tudo</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- HEADER -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <span class="tab-title" id="tabTitle">Tarefas de Hoje</span>
+        <span class="tab-date" id="tabDate"></span>
+      </div>
+      <div class="topbar-right">
+        <div class="streak-badge" title="Dias seguidos de estudo">
+          <span id="streakCount">0</span>
+          <span class="streak-label">dias seguidos</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ═══ TAB: HOJE ═══ -->
+    <section class="tab-content active" id="tab-hoje">
+      <div class="card">
+        <h2 class="card-title">O que fazer hoje</h2>
+
+        <div class="input-row">
+          <input type="text" id="tarefaInput" class="input-field" placeholder="Adicionar tarefa..." />
+          <select id="tarefaPrioridade" class="input-select">
+            <option value="normal">Normal</option>
+            <option value="alta">Alta</option>
+            <option value="baixa">Baixa</option>
+          </select>
+          <button class="btn-primary" id="addTarefa">Adicionar</button>
+        </div>
+
+        <ul class="task-list" id="taskList">
+          <!-- Tasks rendered by JS -->
+        </ul>
+
+        <div class="empty-state" id="emptyTarefas">
+          <p>Nenhuma tarefa ainda.<br>Adicione algo para começar seu dia.</p>
+        </div>
+      </div>
+
+      <div class="card card-sm">
+        <h2 class="card-title">Progresso do dia</h2>
+        <div class="progress-wrap">
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" id="progressBar"></div>
+          </div>
+          <span class="progress-label" id="progressLabel">0%</span>
+        </div>
+        <p class="progress-hint" id="progressHint">Nenhuma tarefa para hoje.</p>
+      </div>
+    </section>
+
+    <!-- ═══ TAB: QUESTÕES ═══ -->
+    <section class="tab-content" id="tab-questoes">
+      <div class="card">
+        <h2 class="card-title">Registrar questões resolvidas</h2>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Matéria</label>
+            <select id="qMateria" class="input-select w-full">
+              <option value="">Selecione...</option>
+              <option>Matemática</option>
+              <option>Português</option>
+              <option>História</option>
+              <option>Geografia</option>
+              <option>Física</option>
+              <option>Química</option>
+              <option>Biologia</option>
+              <option>Literatura</option>
+              <option>Filosofia</option>
+              <option>Sociologia</option>
+              <option>Inglês / Espanhol</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Quantidade</label>
+            <input type="number" id="qQuantidade" class="input-field w-full" placeholder="Ex: 20" min="1" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Acertos</label>
+            <input type="number" id="qAcertos" class="input-field w-full" placeholder="Ex: 15" min="0" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Data</label>
+            <input type="date" id="qData" class="input-field w-full" />
+          </div>
+        </div>
+
+        <button class="btn-primary mt-1" id="addQuestoes">Salvar registro</button>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">Histórico de questões</h2>
+        <div class="table-wrap">
+          <table class="data-table" id="questoesTable">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Matéria</th>
+                <th>Total</th>
+                <th>Acertos</th>
+                <th>Aproveitamento</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="questoesBody"></tbody>
+          </table>
+        </div>
+        <div class="empty-state" id="emptyQuestoes">Nenhum registro ainda.</div>
+      </div>
+    </section>
+
+    <!-- ═══ TAB: MATÉRIAS ═══ -->
+    <section class="tab-content" id="tab-materias">
+      <div class="card">
+        <h2 class="card-title">Registrar sessão de estudo</h2>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Matéria</label>
+            <select id="mMateria" class="input-select w-full">
+              <option value="">Selecione...</option>
+              <option>Matemática</option>
+              <option>Português</option>
+              <option>História</option>
+              <option>Geografia</option>
+              <option>Física</option>
+              <option>Química</option>
+              <option>Biologia</option>
+              <option>Literatura</option>
+              <option>Filosofia</option>
+              <option>Sociologia</option>
+              <option>Inglês / Espanhol</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tópico estudado</label>
+            <input type="text" id="mTopico" class="input-field w-full" placeholder="Ex: Funções do 2º grau" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tempo (min)</label>
+            <input type="number" id="mTempo" class="input-field w-full" placeholder="Ex: 45" min="1" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Data</label>
+            <input type="date" id="mData" class="input-field w-full" />
+          </div>
+        </div>
+        <div class="form-group mt-1">
+          <label class="form-label">Anotações (opcional)</label>
+          <textarea id="mNota" class="input-field w-full" rows="2" placeholder="O que você aprendeu hoje?"></textarea>
+        </div>
+
+        <button class="btn-primary mt-1" id="addMateria">Salvar sessão</button>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">Matérias estudadas</h2>
+        <div class="materias-chips" id="materiasChips">
+          <!-- rendered by JS -->
+        </div>
+        <div class="empty-state" id="emptyMaterias">Nenhuma sessão registrada ainda.</div>
+
+        <div class="table-wrap mt-1">
+          <table class="data-table" id="materiasTable">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Matéria</th>
+                <th>Tópico</th>
+                <th>Tempo</th>
+                <th>Anotações</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="materiasBody"></tbody>
+          </table>
+        </div>
+        <div class="empty-state" id="emptyMateriasTable" style="display:none"></div>
+      </div>
+    </section>
+
+    <!-- ═══ TAB: TEMPO ═══ -->
+    <section class="tab-content" id="tab-tempo">
+      <div class="card">
+        <h2 class="card-title">Cronômetro de estudo</h2>
+        <div class="timer-wrap">
+          <div class="timer-display" id="timerDisplay">00:00:00</div>
+          <div class="timer-materia-row">
+            <select id="timerMateria" class="input-select">
+              <option value="">Selecione a matéria...</option>
+              <option>Matemática</option>
+              <option>Português</option>
+              <option>História</option>
+              <option>Geografia</option>
+              <option>Física</option>
+              <option>Química</option>
+              <option>Biologia</option>
+              <option>Literatura</option>
+              <option>Filosofia</option>
+              <option>Sociologia</option>
+              <option>Inglês / Espanhol</option>
+            </select>
+          </div>
+          <div class="timer-controls">
+            <button class="btn-timer btn-start" id="btnStart">▶ Iniciar</button>
+            <button class="btn-timer btn-pause" id="btnPause" disabled>⏸ Pausar</button>
+            <button class="btn-timer btn-stop" id="btnStop" disabled>⏹ Finalizar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">Tempo por matéria</h2>
+        <div class="tempo-bars" id="tempoBars">
+          <!-- rendered by JS -->
+        </div>
+        <div class="empty-state" id="emptyTempo">Nenhum tempo registrado ainda.</div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">Registros de tempo</h2>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>Data</th><th>Matéria</th><th>Duração</th><th></th></tr>
+            </thead>
+            <tbody id="tempoBody"></tbody>
+          </table>
+        </div>
+        <div class="empty-state" id="emptyTempoTable" style="display:none"></div>
+      </div>
+    </section>
+
+    <!-- ═══ TAB: SEMANA ═══ -->
+    <section class="tab-content" id="tab-semana">
+
+      <!-- Week navigator -->
+      <div class="week-nav">
+        <button class="btn-week-nav" id="btnWeekPrev">‹ Anterior</button>
+        <span class="week-label" id="weekLabel"></span>
+        <button class="btn-week-nav" id="btnWeekNext">Próxima ›</button>
+      </div>
+
+      <!-- Add task to week -->
+      <div class="card">
+        <h2 class="card-title">Adicionar ao planejamento semanal</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Dia da semana</label>
+            <select id="wDia" class="input-select w-full">
+              <option value="">Selecione...</option>
+              <option value="0">Segunda-feira</option>
+              <option value="1">Terça-feira</option>
+              <option value="2">Quarta-feira</option>
+              <option value="3">Quinta-feira</option>
+              <option value="4">Sexta-feira</option>
+              <option value="5">Sábado</option>
+              <option value="6">Domingo</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Matéria / Atividade</label>
+            <input type="text" id="wAtividade" class="input-field w-full" placeholder="Ex: Matemática — Geometria" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Horário (opcional)</label>
+            <input type="time" id="wHorario" class="input-field w-full" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tipo</label>
+            <select id="wTipo" class="input-select w-full">
+              <option value="estudo">Estudo</option>
+              <option value="revisao">Revisão</option>
+              <option value="questoes">Questões</option>
+              <option value="simulado">Simulado</option>
+              <option value="descanso">Descanso</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-primary mt-1" id="addWeekTask">Adicionar</button>
+      </div>
+
+      <!-- Week grid -->
+      <div class="week-grid" id="weekGrid">
+        <!-- rendered by JS -->
+      </div>
+
+    </section>
+
+    <!-- ═══ TAB: RESUMO ═══ -->
+    <section class="tab-content" id="tab-resumo">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-icon">✎</span>
+          <div class="stat-value" id="statQuestoes">0</div>
+          <div class="stat-label">questões resolvidas</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-icon">◎</span>
+          <div class="stat-value" id="statAcertos">0%</div>
+          <div class="stat-label">de aproveitamento</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-icon">◷</span>
+          <div class="stat-value" id="statTempo">0h</div>
+          <div class="stat-label">de estudo</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-icon">◈</span>
+          <div class="stat-value" id="statMaterias">0</div>
+          <div class="stat-label">matérias estudadas</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">Distribuição de tempo por matéria</h2>
+        <div class="tempo-bars" id="resumoTempoBars"></div>
+        <div class="empty-state" id="emptyResumo">Sem dados ainda. Registre suas sessões de estudo!</div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">Aproveitamento por matéria</h2>
+        <div class="aproveitamento-list" id="aproveitamentoList"></div>
+        <div class="empty-state" id="emptyAproveitamento">Nenhuma questão registrada ainda.</div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
